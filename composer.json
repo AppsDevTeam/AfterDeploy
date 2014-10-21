@@ -4,10 +4,6 @@
         "nette/nette": "~2.2.0"
     },
 
-    "require-dev": {
-        "dg/ftp-deployment": "dev-master"
-    },
-
     "authors": [
         {
             "name": "Vojtech Studenka",
