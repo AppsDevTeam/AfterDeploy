@@ -1,13 +1,25 @@
 <?php
 
 namespace ADT\Deployment;
-use Nette\Utils\FileSystem;
 
 /**
  * Class Deployment
  * @package ADT\Deployment
  */
 class Deployment {
+
+	public static function emptyDirectory($dir) {
+		if (is_dir($dir)) {
+			$objects = scandir($dir);
+			foreach ($objects as $object) {
+				if ($object != "." && $object != "..") {
+					if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
+				}
+			}
+			reset($objects);
+			self::emptyDirectory($dir);
+		}
+	}
 
 	public static function install ($tempDir) {
 
@@ -19,8 +31,8 @@ class Deployment {
 		$message .= "Bower installed. ";
 
 		// empty temp directory
-		FileSystem::delete($tempDir);
-		FileSystem::createDir($tempDir);
+		self::emptyDirectory($tempDir);
+		mkdir($tempDir);
 
 		$message .="Temp dir cleared. ";
 
