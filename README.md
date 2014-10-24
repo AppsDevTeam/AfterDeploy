@@ -11,12 +11,12 @@ Installation
 1. Add repository to `composer.json`
 <pre>
   "require": {
-		  "php": ">= 5.3.7",
-      "adt/deployment": "dev-master"
+	"php": ">= 5.3.7",
+	"adt/deployment": "dev-master"
   },
 
   "require-dev": {
-      "dg/ftp-deployment": "dev-master",
+	"dg/ftp-deployment": "dev-master",
   },
 	
   "repositories": [
