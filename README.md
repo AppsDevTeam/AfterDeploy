@@ -52,6 +52,7 @@ local = .
 test = no
 ; files and directories to ignore
 ignore = "
+	.git*
 	/private/temp/*
 	/private/log/*
 	/deployment.*
