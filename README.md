@@ -32,6 +32,7 @@ Installation
 <pre>
 // $tempDir will be cleared
 $developers = array('127.0.0.1', 'yourIP');
+$tempDir = '__DIR__ . '/../temp'';
 $remoteAddr = isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : NULL;
 if(in_array($remoteAddr, $developers) && isset($_GET["afterDeploy"])) {
         $deployment = __DIR__ . "/../vendor/adt/deployment/src/Deployment.php";
@@ -53,16 +54,20 @@ local = .
 test = no
 ; files and directories to ignore
 ignore = "
-	.git*
-	/private/temp/*
+	/private/app/config/config.local.neon
 	/private/log/*
-	/deployment.*
-	/web/vendor/*
+	/private/sessions/*
+	/private/temp/*
 	/private/vendor/*
 	!/private/vendor/adt
 	/private/vendor/adt/*
 	!/private/vendor/adt/deployment
 	!/private/vendor/others
+	/web/data/*
+	/web/vendor/*
+	/web/cnb.txt
+	/deployment.*
+	.git*
 "
 ; is allowed to delete remote files? (defaults to yes)
 allowdelete = yes
