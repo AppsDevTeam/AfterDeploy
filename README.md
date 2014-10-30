@@ -65,7 +65,6 @@ ignore = "
 	!/private/vendor/others
 	/web/data/*
 	/web/vendor/*
-	/web/cnb.txt
 	/deployment.*
 	.git*
 "
