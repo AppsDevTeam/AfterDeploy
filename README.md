@@ -32,7 +32,8 @@ Installation
 <pre>
 // $tempDir will be cleared
 $developers = array('127.0.0.1', 'yourIP');
-if(in_array($_SERVER["REMOTE_ADDR"], $developers) && isset($_GET["afterDeploy"])) {
+$remoteAddr = isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : NULL;
+if(in_array($remoteAddr, $developers) && isset($_GET["afterDeploy"])) {
         $deployment = __DIR__ . "/../vendor/adt/deployment/src/Deployment.php";
         
         if(file_exists($deployment)) {
