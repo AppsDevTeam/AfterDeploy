@@ -83,7 +83,7 @@ class Deployment {
 	 */
 	public static function installComposerDeps() {
 		// checks if bower is installed
-		$version = preg_match("/Composer version (?<version>\w+) .+/", self::cmd("composer -V"), $match);
+		$version = preg_match("/Composer version .+/", self::cmd("composer -V"), $match);
 
 		if($version && strlen($match["version"]) >= 40) {
 			self::cmd("composer install -o -n --no-dev");
@@ -155,11 +155,16 @@ class Deployment {
 
 		if(self::detectMode())
 			echo(Ansi::tagsToColors(implode(" ", self::$output)));
-		else
+		else {
 			foreach(self::$commands as $command => $result) {
 				echo "<br>\$ <strong>$command</strong>:<br>";
 				echo preg_replace("/\r\n|\r|\n/", '<br>', $result);
 			}
+
+			echo "<br><br>" . Ansi::stripTags(implode(" ", self::$output));
+		}
+
+
 	}
 
 }
