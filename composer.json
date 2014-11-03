@@ -1,8 +1,5 @@
 {
     "name": "adt/deployment",
-    "require": {
-        "nette/nette": "~2.2.0"
-    },
 
     "authors": [
         {

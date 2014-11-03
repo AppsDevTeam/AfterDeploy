@@ -85,7 +85,7 @@ class Deployment {
 		// checks if bower is installed
 		$version = preg_match("/Composer version .+/", self::cmd("composer -V"), $match);
 
-		if($version && strlen($match["version"]) >= 40) {
+		if($version) {
 			self::cmd("composer install -o -n --no-dev");
 			return self::log("Composer <bgGreen>installed<reset>.");
 		}
