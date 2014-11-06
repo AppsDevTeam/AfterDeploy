@@ -135,8 +135,20 @@ class Deployment {
 		// clear $tempDir
 		if(isset($tempDir) && is_dir($tempDir)) {
 			self::removeDirectory($tempDir);
-			mkdir($tempDir);
-			self::log("Temp dir <bgGreen>cleared<reset>.");
+
+			if(!file_exists($tempDir)) {
+				mkdir($tempDir);
+			} else {
+				self::log("Temp dir <bgRed><white>was not fully removed<reset>.");
+			}
+
+			$i = new \FilesystemIterator($tempDir, \FilesystemIterator::SKIP_DOTS);
+			if(iterator_count($i) == 0) {
+				self::log("Temp dir <bgGreen>cleared<reset>.");
+			} else {
+				self::log("Temp dir <bgRed><white>was not cleared properly<reset>.");
+			}
+
 		} else self::log("Temp dir <cyan>is not defined<reset>.");
 
 		self::resetCache();
