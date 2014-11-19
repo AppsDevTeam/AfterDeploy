@@ -72,7 +72,7 @@ class Deployment {
 
 			if(!empty($bower))
 				return self::log("Bower <bgGreen>installed<reset>.");
-			return self::log("Bower <yellow>skipped<reset>.");
+			return self::log("Bower <yellow>nothing to install<reset>.");
 		}
 
 		return self::log("Bower <bgRed>is not installed<reset>!");
