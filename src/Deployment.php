@@ -68,7 +68,7 @@ class Deployment {
 		// checks if bower is installed
 		if(preg_match("/([0-9\.]+)/", self::cmd("bower -v", TRUE))) {
 
-			self::cmd('bower install --production');
+			$bower = self::cmd('bower install --production');
 
 			if(!empty($bower))
 				return self::log("Bower <bgGreen>installed<reset>.");
