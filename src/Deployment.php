@@ -26,7 +26,7 @@ class Deployment {
 		if (is_dir($dir)) {
 			$objects = scandir($dir);
 			foreach ($objects as $object) {
-				if ($object != "." && $object != "..") {
+				if ($object != "." && $object != ".." && $object != ".gitignore") {
 					if (filetype($dir."/".$object) == "dir")
 						self::removeDirectory($dir."/".$object);
 					else unlink($dir."/".$object);
