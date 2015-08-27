@@ -10,6 +10,7 @@
 			"homepage": "http://appsdevteam.com"
 		}
 	],
+	"minimum-stability": "dev",
 	"require": {
 		"simoneast/simple-ansi-colors": "dev-master",
 		"sensiolabs/ansi-to-html": "~1.0"
