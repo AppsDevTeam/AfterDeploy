@@ -181,31 +181,15 @@ class Deployment {
 			$out .= "<bgBlue>$ $command:<reset>". "\n$result\n";
 		}
 		$out .= "\n\n" . implode("\n", $this->output) . "\n";
+		$out = \Ansi::tagsToColors($out);
 
 		if ($this->isTerminalMode()) {
-			echo \Ansi::tagsToColors($out);
+			echo $out;
 		} else {
 
 			$converter = new \SensioLabs\AnsiConverter\AnsiToHtmlConverter();
-			echo $converter->convert($out);
-
-			//echo AnsiToHtml::tagsToColors(nl2br($out));
-		}
-		return;
-
-		if ($this->detectMode()) {
-			foreach ($this->commands as $command => $result) {
-				echo \Ansi::tagsToColors("<bgBlue>$ $command:<reset>"). "\n$result\n";
-			}
-
-			echo "\n\n" . \Ansi::tagsToColors(implode("\n", $this->output)) . "\n";
-
-		} else {
-			foreach ($this->commands as $command => $result) {
-				echo "<strong>\$ $command</strong>:<br>" . nl2br($result) ."<br>";
-			}
-
-			echo "<br><br>" . \Ansi::stripTags(implode("<br>", $this->output)) . "<br>";
+			echo "<style> body { background:black; } </style>";
+			echo nl2br($converter->convert($out));
 		}
 	}
 
