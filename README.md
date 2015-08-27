@@ -23,13 +23,15 @@ $developers = [
 	'1.2.3.4',
 ];
 
+$tempDir = __DIR__ . '/../temp';
+
 $remoteAddr = isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : NULL;
 if (in_array($remoteAddr, $developers) && isset($_GET["afterDeploy"])) {
 	$deployment = __DIR__ . "/../vendor/adt/deployment/src/Deployment.php";
 
 	if (file_exists($deployment)) {
 		include $deployment;
-		(new ADT\Deployment\Deployment)->run();
+		(new ADT\Deployment\Deployment)->run($tempDir);
 	}
 }
 ```
