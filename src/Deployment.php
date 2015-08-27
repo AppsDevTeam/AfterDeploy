@@ -179,7 +179,7 @@ class Deployment {
 	protected function sendResponse() {
 
 		if ($this->detectMode()) {
-			echo(Ansi::tagsToColors(implode(" ", $this->output)));
+			echo(\Ansi::tagsToColors(implode(" ", $this->output)));
 
 		} else {
 			foreach ($this->commands as $command => $result) {
@@ -187,7 +187,7 @@ class Deployment {
 				echo nl2br($result);
 			}
 
-			echo "<br><br>" . Ansi::stripTags(implode(" ", $this->output));
+			echo "<br><br>" . \Ansi::stripTags(implode(" ", $this->output));
 		}
 	}
 
