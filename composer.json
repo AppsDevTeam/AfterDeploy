@@ -10,9 +10,19 @@
 			"homepage": "http://appsdevteam.com"
 		}
 	],
+	"require": {
+		"simoneast/simple-ansi-colors": "dev-master",
+		"sensiolabs/ansi-to-html": "~1.O"
+	},
 	"autoload": {
 		"psr-4": {
 			"ADT\\Deployment\\": "src/"
 		}
-	}
+	},
+	"repositories": [
+		{
+       "type": "git",
+       "url": "https://github.com/SimonEast/Simple-Ansi-Colors.git"
+    }
+	]
 }

@@ -124,10 +124,10 @@ class Deployment {
 	}
 
 	/**
-	 * Detect access via browser
+	 * Detect access via console
 	 * @return boolean
 	 */
-	protected function detectMode() {
+	protected function isTerminalMode() {
 		return empty($_SERVER["HTTP_USER_AGENT"]);
 	}
 
@@ -136,9 +136,9 @@ class Deployment {
 	 * @param string $tempDir
 	 */
 	public function run($tempDir) {
-		putenv('PATH=' . system('echo $PATH')); // Bez tohoto nefunguje composer (ENOGIT), protože nefunguje `which git`, protože v php.ini není PATH nastavena.
-
 		ob_start();
+
+		putenv('PATH=' . system('echo $PATH')); // Bez tohoto nefunguje composer (ENOGIT), protože nefunguje `which git`, protože v php.ini není PATH nastavena.
 
 		$this->installComposerDeps();
 		$this->installBowerDeps();
@@ -150,14 +150,14 @@ class Deployment {
 			if (!file_exists($tempDir)) {
 				mkdir($tempDir);
 			} else {
-				$this->log("Temp dir <bgRed><white>was not fully removed<reset>.");
+				$this->log("Temp dir <bgRed>was not fully removed<reset>.");
 			}
 
 			$i = new \FilesystemIterator($tempDir, \FilesystemIterator::SKIP_DOTS);
 			if (iterator_count($i) == 0) {
 				$this->log("Temp dir <bgGreen>cleared<reset>.");
 			} else {
-				$this->log("Temp dir <bgRed><white>was not cleared properly<reset>.");
+				$this->log("Temp dir <bgRed>was not cleared properly<reset>.");
 			}
 
 		} else {
@@ -178,16 +178,32 @@ class Deployment {
 	 */
 	protected function sendResponse() {
 
+		$out = '';
+		foreach ($this->commands as $command => $result) {
+			$out .= "<bgBlue>$ $command:<reset>". "\n$result\n";
+		}
+		$out .= "\n\n" . implode("\n", $this->output) . "\n";
+
+		if ($this->isTerminalMode()) {
+			echo \Ansi::tagsToColors($out);
+		} else {
+			echo AnsiToHtml::tagsToColors(nl2br($out));
+		}
+		return;
+
 		if ($this->detectMode()) {
-			echo(\Ansi::tagsToColors(implode(" ", $this->output)));
+			foreach ($this->commands as $command => $result) {
+				echo \Ansi::tagsToColors("<bgBlue>$ $command:<reset>"). "\n$result\n";
+			}
+
+			echo "\n\n" . \Ansi::tagsToColors(implode("\n", $this->output)) . "\n";
 
 		} else {
 			foreach ($this->commands as $command => $result) {
-				echo "<br>\$ <strong>$command</strong>:<br>";
-				echo nl2br($result);
+				echo "<strong>\$ $command</strong>:<br>" . nl2br($result) ."<br>";
 			}
 
-			echo "<br><br>" . \Ansi::stripTags(implode(" ", $this->output));
+			echo "<br><br>" . \Ansi::stripTags(implode("<br>", $this->output)) . "<br>";
 		}
 	}
 
