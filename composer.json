@@ -12,7 +12,7 @@
 	],
 	"require": {
 		"simoneast/simple-ansi-colors": "dev-master",
-		"sensiolabs/ansi-to-html": "~1.O"
+		"sensiolabs/ansi-to-html": "~1.0"
 	},
 	"autoload": {
 		"psr-4": {
