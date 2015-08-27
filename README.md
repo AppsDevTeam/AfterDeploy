@@ -6,71 +6,40 @@ Server requirements
 - OP Cache (optional)
 - APCu (optional)
 
-Installation
+Installation & usage
 ==========
-1. Add repository to `composer.json`
-<pre>
-  "require": {
-	"php": ">= 5.3.7",
-	"adt/deployment": "dev-master"
-  },
 
-  "require-dev": {
-	"dg/ftp-deployment": "dev-master",
-  },
-	
-  "repositories": [
-      {
-          "type": "git",
-          "url": "https://github.com/AppsDevTeam/deployment.git"
-      }
-  ]
-</pre>
+1. The best way to install is using [Composer](http://getcomposer.org/):
 
-2. `composer update`
-3. Before including `vendor/autoload.php` you have to handle after deploy request like this:
-<pre>
-// $tempDir will be cleared
-$developers = array('127.0.0.1', 'yourIP');
-$tempDir = '__DIR__ . '/../temp'';
+
+```sh
+$ composer require adt/deployment
+```
+
+2. Before including `vendor/autoload.php` in your `bootstrap.php` you have to handle after deploy request like this:
+```php
+$developers = [
+	'127.0.0.1',
+	'1.2.3.4',
+];
+
 $remoteAddr = isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : NULL;
-if(in_array($remoteAddr, $developers) && isset($_GET["afterDeploy"])) {
-        $deployment = __DIR__ . "/../vendor/adt/deployment/src/Deployment.php";
-        
-        if(file_exists($deployment)) {
-          include $deployment;
-          ADT\Deployment\Deployment::install($tempDir);
-        }
+if (in_array($remoteAddr, $developers) && isset($_GET["afterDeploy"])) {
+	$deployment = __DIR__ . "/../vendor/adt/deployment/src/Deployment.php";
+
+	if (file_exists($deployment)) {
+		include $deployment;
+		(new ADT\Deployment\Deployment)->run();
+	}
 }
-include __DIR__ . '/../vendor/autoload.php';
-</pre>
-4. Edit deployment configuration file `deployment.ini` like:
-<pre>
-; remote FTP server
-remote = ftps://user:pass@host:port
-; local path (optional)
-local = .
-; run in test-mode? (can be enabled by option -t or --test too)
-test = no
-; files and directories to ignore
-ignore = "
-	/private/app/config/config.local.neon
-	/private/log/*
-	/private/sessions/*
-	/private/temp/*
-	/private/vendor/*
-	!/private/vendor/adt
-	/private/vendor/adt/*
-	!/private/vendor/adt/deployment
-	!/private/vendor/others
-	/web/data/*
-	/web/vendor/*
-	/deployment.*
-	.git*
-"
-; is allowed to delete remote files? (defaults to yes)
-allowdelete = yes
+```
+
+4. Update deployment configuration file `deployment.ini` like:
+```neon
 after[] = http://example.com/?afterDeploy
-preprocess = no
-</pre>
-5. Run dg/ftp-deployment script `php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini`
+```
+
+5. Run `dg/ftp-deployment` script
+```
+$ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
+```
