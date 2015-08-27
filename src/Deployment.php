@@ -2,8 +2,6 @@
 
 namespace ADT\Deployment;
 
-require __DIR__ . '/../libs/Ansi.php';
-
 /**
  * Class Deployment
  * @package ADT\Deployment
@@ -187,7 +185,11 @@ class Deployment {
 		if ($this->isTerminalMode()) {
 			echo \Ansi::tagsToColors($out);
 		} else {
-			echo AnsiToHtml::tagsToColors(nl2br($out));
+
+			$converter = new \SensioLabs\AnsiConverter\AnsiToHtmlConverter();
+			echo $converter->convert($out);
+
+			//echo AnsiToHtml::tagsToColors(nl2br($out));
 		}
 		return;
 
