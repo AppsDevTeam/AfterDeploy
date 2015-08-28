@@ -17,6 +17,19 @@ class Deployment {
 	/** @var bool */
 	protected $cliMode = TRUE;
 
+	public static function onStartup($config) {
+
+		if (\Tracy\Debugger::$productionMode) {
+			return;
+		}
+
+		if (! isset($_GET[$config['key']])) {
+			return;
+		}
+
+		(new static)->run($config['tempDir']);
+	}
+
 	/**
 	 * Remove $dir
 	 * @param $dir
