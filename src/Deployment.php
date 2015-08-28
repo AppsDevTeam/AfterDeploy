@@ -2,6 +2,8 @@
 
 namespace ADT\Deployment;
 
+use Nette\Utils\Finder;
+
 /**
  * Class Deployment
  * @package ADT\Deployment
@@ -34,21 +36,22 @@ class Deployment {
 	 * Remove $dir
 	 * @param $dir
 	 */
-	protected function removeDirectory($dir) {
+	protected function removeDirectory($dir, $rmDir = FALSE) {
 
-		if (is_dir($dir)) {
-			$objects = scandir($dir);
-			foreach ($objects as $object) {
-				if ($object == "." || $object == ".." || $object == ".gitignore") continue;
+		if (!is_dir($dir)) return;
 
-				if (filetype($dir . "/" . $object) == "dir") {
-					$this->removeDirectory($dir . "/" . $object);
+		foreach (scandir($dir) as $object) {
+			if ($object === "." || $object === ".." || $object === ".gitignore") continue;
 
-				} else {
-					unlink($dir . "/" . $object);
-				}
+			if (filetype($dir . "/" . $object) === "dir") {
+				$this->removeDirectory($dir . "/" . $object, TRUE);
+
+			} else {
+				unlink($dir . "/" . $object);
 			}
-			reset($objects);
+		}
+
+		if ($rmDir) {
 			rmdir($dir);
 		}
 	}
@@ -146,7 +149,7 @@ class Deployment {
 	 * Install all packages/dependencies and clear cache
 	 * @param string $tempDir
 	 */
-	public function run($tempDir) {
+	public function run($tempDir = NULL) {
 		ob_start();
 
 		putenv('PATH=' . system('echo $PATH')); // Bez tohoto nefunguje composer (ENOGIT), protože nefunguje `which git`, protože v php.ini není PATH nastavena.
@@ -158,17 +161,10 @@ class Deployment {
 		if (isset($tempDir) && is_dir($tempDir)) {
 			$this->removeDirectory($tempDir);
 
-			if (!file_exists($tempDir)) {
-				mkdir($tempDir);
-			} else {
-				$this->log("Temp dir <bgRed>was not fully removed<reset>.");
-			}
-
-			$i = new \FilesystemIterator($tempDir, \FilesystemIterator::SKIP_DOTS);
-			if (iterator_count($i) == 0) {
-				$this->log("Temp dir <bgGreen>cleared<reset>.");
-			} else {
+			if (Finder::findFiles('*')->exclude('.gitignore')->in($tempDir)->count()) {
 				$this->log("Temp dir <bgRed>was not cleared properly<reset>.");
+			} else {
+				$this->log("Temp dir <bgGreen>cleared<reset>.");
 			}
 
 		} else {
@@ -181,6 +177,10 @@ class Deployment {
 
 		// send response to output
 		$this->sendResponse();
+
+		// Nebudeme spouštět laděnku (bar), protože ta většinou potřebuje spoustu služeb a ty zase tempDir a tu jsme promazali.
+		\Tracy\Debugger::$productionMode = TRUE;
+
 		die;
 	}
 
