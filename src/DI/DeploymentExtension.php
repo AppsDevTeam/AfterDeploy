@@ -1,6 +1,6 @@
 <?php
 
-namespace ADT\Deployment;
+namespace ADT\Deployment\DI;
 
 class DeploymentExtension extends \Nette\DI\CompilerExtension
 {
