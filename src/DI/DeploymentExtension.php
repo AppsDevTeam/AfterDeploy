@@ -10,6 +10,10 @@ class DeploymentExtension extends \Nette\DI\CompilerExtension
 	 */
 	protected static $defaults = array(
 		'key' => 'afterDeploy',
+		'redis' => [
+			'client' => NULL,
+			'dbs' => [],
+		],
 	);
 
 	protected $config;

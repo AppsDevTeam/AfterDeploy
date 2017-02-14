@@ -5,6 +5,7 @@ Server requirements
 - Bower
 - OP Cache (optional)
 - APCu (optional)
+- Redis (optional)
 
 Installation & usage
 ==========
@@ -38,4 +39,8 @@ $ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
 ```neon
 deployment:
 	key: mySecretKey # default: afterDeploy
+	redis:
+		client: @redis.client # \Kdyby\Redis\RedisClient
+		dbs:
+			- 1 # clear db 1
 ```

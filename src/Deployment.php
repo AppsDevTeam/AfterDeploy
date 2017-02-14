@@ -29,7 +29,7 @@ class Deployment {
 			return;
 		}
 
-		(new static)->run($config['tempDir']);
+		(new static)->run($config);
 	}
 
 	/**
@@ -138,6 +138,30 @@ class Deployment {
 	}
 
 	/**
+	 * Clear Redis
+	 */
+	protected function clearRedis($redis = []) {
+		if (!class_exists('Kdyby\Redis\RedisClient')) {
+			return;
+		}
+
+		if (!$redis['client'] instanceof \Kdyby\Redis\RedisClient || empty($redis['dbs'])) {
+			return;
+		}
+
+		/** @var \Kdyby\Redis\RedisClient */
+		$client = $redis['client'];
+
+		foreach ($redis['dbs'] as $dbIndex) {
+			if ($client->select($dbIndex)) {
+				$client->flushDb();
+			}
+		}
+
+		$this->log("Redis <bgGreen>cleared<reset>.");
+	}
+
+	/**
 	 * Detect access via console
 	 * @return boolean
 	 */
@@ -147,9 +171,9 @@ class Deployment {
 
 	/**
 	 * Install all packages/dependencies and clear cache
-	 * @param string $tempDir
+	 * @param array $config
 	 */
-	public function run($tempDir = NULL) {
+	public function run($config = []) {
 		ob_start();
 
 		putenv('PATH=' . system('echo $PATH')); // Bez tohoto nefunguje composer (ENOGIT), protože nefunguje `which git`, protože v php.ini není PATH nastavena.
@@ -157,11 +181,11 @@ class Deployment {
 		$this->installComposerDeps();
 		$this->installBowerDeps();
 
-		// clear $tempDir
-		if (isset($tempDir) && is_dir($tempDir)) {
-			$this->removeDirectory($tempDir);
+		// clear tempDir
+		if (isset($config['tempDir']) && is_dir($config['tempDir'])) {
+			$this->removeDirectory($config['tempDir']);
 
-			if (Finder::findFiles('*')->exclude('.gitignore')->in($tempDir)->count()) {
+			if (Finder::findFiles('*')->exclude('.gitignore')->in($config['tempDir'])->count()) {
 				$this->log("Temp dir <bgRed>was not cleared properly<reset>.");
 			} else {
 				$this->log("Temp dir <bgGreen>cleared<reset>.");
@@ -170,6 +194,8 @@ class Deployment {
 		} else {
 			$this->log("Temp dir <cyan>is not defined<reset>.");
 		}
+
+		$this->clearRedis($config['redis']);
 
 		$this->resetCache();
 
