@@ -17,24 +17,35 @@ Installation & usage
 $ composer require adt/deployment
 ```
 
-2. Enable the extension in your neon config:
+2. Add this code in bootstrap.php before including autoload.php
+```php
+ include __DIR__ . '/../vendor/adt/deployment/src/Deployment.php';
+ (new ADT\Deployment\Deployment())
+ 	->runBase([
+ 		'tempDir' => '/path/to/tempDir/', //required
+ 		'key' => 'afterDeploy' // optional
+ 	]
+);
+```
+
+3. Enable the extension in your neon config:
 
 ```neon
 extensions:
 	deployment: ADT\Deployment\DI\DeploymentExtension
 ```
 
-3. Update deployment configuration file `deployment.ini` like:
+4. Update deployment configuration file `deployment.ini` like:
 ```neon
 after[] = http://example.com/?afterDeploy
 ```
 
-4. Run `dg/ftp-deployment` script
+5. Run `dg/ftp-deployment` script
 ```
 $ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
 ```
 
-5. Optionaly you can change the key in neon config:
+6. Optionaly you can change the key in neon config (the key has to be same as the one defined in bootstrap.php):
 
 ```neon
 deployment:

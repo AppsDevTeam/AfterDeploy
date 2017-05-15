@@ -2,30 +2,36 @@
 
 namespace ADT\Deployment;
 
-use Nette\Utils\Finder;
-
 /**
  * Class Deployment
  * @package ADT\Deployment
  */
 class Deployment {
 
+	/**
+	 * Default $_GET key
+	 */
+	const DEFAULT_KEY = 'afterDeploy';
+
 	/** @var array */
 	protected $commands = [];
 
-	/** @var array  */
-	protected $output = [];
+	/**
+	 * Je to statická proměnná, protože se tato třídá používá
+	 * na začátku bootstrapu před autoloadem a poté po spuštění aplikace
+	 * jako extension. V obou máme texty, které chceme vypisovat,
+	 * proto je musíme spojit a vypsat až později.
+	 *
+	 * @var array
+	 */
+	protected static $output = [];
 
 	/** @var bool */
 	protected $cliMode = TRUE;
 
-	public static function onStartup($config) {
-
-		if (\Tracy\Debugger::$productionMode) {
-			return;
-		}
-
-		if (! isset($_GET[$config['key']])) {
+	public static function onStartup($config)
+	{
+		if (static::shouldStartDeploy($config)) {
 			return;
 		}
 
@@ -78,7 +84,7 @@ class Deployment {
 	 * @return string
 	 */
 	protected function log($string) {
-		return $this->output[] = $string;
+		return static::$output[] = $string;
 	}
 
 	/**
@@ -119,7 +125,7 @@ class Deployment {
 	/**
 	 * Clears APC and OpCache
 	 */
-	protected function resetCache() {
+	protected function resetAPCandOPCache() {
 		// checks if exists opcache
 		if (function_exists("opcache_reset")) {
 			$reset = opcache_reset();
@@ -138,10 +144,37 @@ class Deployment {
 	}
 
 	/**
+	 * Clears tempDir
+	 * @param array $config
+	 */
+	protected function clearCache($config = []) {
+		// clear tempDir
+		if (isset($config['tempDir']) && is_dir($config['tempDir'])) {
+			$this->removeDirectory($config['tempDir']);
+
+			$count = 0;
+			foreach (scandir($config['tempDir']) as $object) {
+				if ($object === "." || $object === ".." || $object === ".gitignore") continue;
+
+				$count++;
+			}
+
+			if ($count !== 0) {
+				$this->log("Temp dir <bgRed>was not cleared properly<reset>.");
+			} else {
+				$this->log("Temp dir <bgGreen>cleared<reset>.");
+			}
+
+		} else {
+			$this->log("Temp dir <cyan>is not defined<reset>.");
+		}
+	}
+
+	/**
 	 * Clear Redis
 	 */
 	protected function clearRedis($redis = []) {
-		if (!class_exists('Kdyby\Redis\RedisClient')) {
+		if (!class_exists('\Kdyby\Redis\RedisClient')) {
 			return;
 		}
 
@@ -169,11 +202,21 @@ class Deployment {
 		return empty($_SERVER["HTTP_USER_AGENT"]);
 	}
 
+	protected static function shouldStartDeploy($config) {
+		$key = isset($config['key']) && !empty($config['key']) ? $config['key'] : self::DEFAULT_KEY;
+		return isset($_GET[$key]);
+	}
+
 	/**
+	 * Run this function in bootstrap.php before autoload.php
 	 * Install all packages/dependencies and clear cache
 	 * @param array $config
 	 */
-	public function run($config = []) {
+	public function runBase($config = []) {
+		if (!static::shouldStartDeploy($config)) {
+			return;
+		}
+
 		ob_start();
 
 		putenv('PATH=' . system('echo $PATH')); // Bez tohoto nefunguje composer (ENOGIT), protože nefunguje `which git`, protože v php.ini není PATH nastavena.
@@ -181,23 +224,30 @@ class Deployment {
 		$this->installComposerDeps();
 		$this->installBowerDeps();
 
-		// clear tempDir
-		if (isset($config['tempDir']) && is_dir($config['tempDir'])) {
-			$this->removeDirectory($config['tempDir']);
+		$this->clearCache($config);
+		$this->resetAPCandOPCache();
 
-			if (Finder::findFiles('*')->exclude('.gitignore')->in($config['tempDir'])->count()) {
-				$this->log("Temp dir <bgRed>was not cleared properly<reset>.");
-			} else {
-				$this->log("Temp dir <bgGreen>cleared<reset>.");
-			}
+		ob_clean();
 
-		} else {
-			$this->log("Temp dir <cyan>is not defined<reset>.");
+		// die je až v run(), který se spustí po spuštění aplikace
+	}
+
+	/**
+	 * Clear cache
+	 * @param array $config
+	 */
+	public function run($config = []) {
+		if (!static::shouldStartDeploy($config)) {
+			return;
 		}
 
-		$this->clearRedis($config['redis']);
+		ob_start();
 
-		$this->resetCache();
+		if (isset($config['redis'])) {
+			$this->clearRedis($config['redis']);
+		}
+
+		$this->clearCache($config);
 
 		ob_clean();
 
@@ -219,7 +269,7 @@ class Deployment {
 		foreach ($this->commands as $command => $result) {
 			$out .= "<bgBlue>$ $command:<reset>". "\n$result\n";
 		}
-		$out .= "\n\n" . implode("\n", $this->output) . "\n";
+		$out .= "\n\n" . implode("\n", static::$output) . "\n";
 		$out = \Ansi::tagsToColors($out);
 
 		if ($this->isTerminalMode()) {
