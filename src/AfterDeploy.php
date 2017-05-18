@@ -1,12 +1,12 @@
 <?php
 
-namespace ADT\Deployment;
+namespace ADT\AfterDeploy;
 
 /**
- * Class Deployment
- * @package ADT\Deployment
+ * Class AfterDeploy
+ * @package ADT\AfterDeploy
  */
-class Deployment {
+class AfterDeploy {
 
 	/**
 	 * Default $_GET key
@@ -21,6 +21,9 @@ class Deployment {
 
 	/** @var string */
 	protected static $wwwDir;
+
+	/** @var int|bool */
+	protected static $useMaintenance = 0;
 
 	/** @var array */
 	protected $commands = [];
@@ -40,6 +43,9 @@ class Deployment {
 
 	public static function onStartup($config) {
 		$config['key'] = static::$key;
+		$config['wwwDir'] = static::$wwwDir;
+		$config['useMaintenance'] = static::$useMaintenance;
+		$config['sleep'] = static::$sleep;
 
 		if (!static::shouldStartDeploy($config)) {
 			return;
@@ -221,6 +227,10 @@ class Deployment {
 		return isset($_GET[static::$key]);
 	}
 
+	protected static function shouldUseMaintenance($config) {
+		return static::$useMaintenance = isset($config['useMaintenance']) ? $config['useMaintenance'] : FALSE;
+	}
+
 	/**
 	 * @param array $config
 	 */
@@ -267,8 +277,10 @@ class Deployment {
 			return;
 		}
 
-		$this->toggleMaintenance($config);
-		$this->sleep($config);
+		if (static::shouldUseMaintenance($config)) {
+			$this->toggleMaintenance($config);
+			$this->sleep($config);
+		}
 
 		ob_start();
 
@@ -304,8 +316,10 @@ class Deployment {
 
 		ob_clean();
 
-		$this->toggleMaintenance($config);
-		static::$wwwDir = NULL;
+		if (static::shouldUseMaintenance($config)) {
+			$this->toggleMaintenance($config);
+			static::$wwwDir = NULL;
+		}
 
 		// send response to output
 		$this->sendResponse();

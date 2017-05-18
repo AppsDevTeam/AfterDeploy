@@ -19,13 +19,14 @@ $ composer require adt/deployment
 
 2. Add this code in bootstrap.php before including autoload.php
 ```php
- include __DIR__ . '/../vendor/adt/deployment/src/Deployment.php';
- (new ADT\Deployment\Deployment())
+ include __DIR__ . '/../vendor/adt/deployment/src/AfterDeploy.php';
+ (new ADT\AfterDeploy\AfterDeploy())
  	->runBase([
  		'tempDir' => '/path/to/tempDir/', // required
- 		'wwwDir' => '/path/to/wwwDir/', // optional, if not given, tempDir/../www is used
+ 		'wwwDir' => '/path/to/wwwDir/', // optional, if not given, tempDir/../www is used, on
  		'key' => 'afterDeploy', // optional
- 		'sleep' => 1 // optional, time to wait before afterDeploy starts in seconds
+ 		'useMaintenance' => 1 // optional, default = 0
+ 		'sleep' => 1 // optional, time to wait before afterDeploy starts in seconds, if useMaintenance is 0 it's not used
  	]
 );
 ```
@@ -34,7 +35,7 @@ $ composer require adt/deployment
 
 ```neon
 extensions:
-	deployment: ADT\Deployment\DI\DeploymentExtension
+	deployment: ADT\AfterDeploy\DI\AfterDeployExtension
 ```
 
 4. Update deployment configuration file `deployment.ini` like:
@@ -50,7 +51,7 @@ $ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
 6. Optionaly you can set the redis in neon config:
 
 ```neon
-deployment:
+afterDeploy:
 	redis:
 		client: @redis.client # \Kdyby\Redis\RedisClient
 		dbs:

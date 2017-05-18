@@ -1,8 +1,8 @@
 {
-	"name": "adt/deployment",
+	"name": "adt/after-deploy",
 	"type": "library",
 	"description": "",
-	"keywords": ["nette", "deployment", "composer", "bower"],
+	"keywords": ["nette", "deployment", "composer", "bower", "after", "deploy", "afterDeploy", "after-deploy"],
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
