@@ -16,6 +16,12 @@ class Deployment {
 	/** @var string */
 	protected static $key = self::DEFAULT_KEY;
 
+	/** @var int seconds */
+	protected static $sleep = 1;
+
+	/** @var string */
+	protected static $wwwDir;
+
 	/** @var array */
 	protected $commands = [];
 
@@ -206,9 +212,49 @@ class Deployment {
 		return empty($_SERVER["HTTP_USER_AGENT"]);
 	}
 
+	/**
+	 * @param array $config
+	 * @return bool
+	 */
 	protected static function shouldStartDeploy($config) {
 		static::$key = !empty($config['key']) ? $config['key'] : static::DEFAULT_KEY;
 		return isset($_GET[static::$key]);
+	}
+
+	/**
+	 * @param array $config
+	 */
+	protected function toggleMaintenance($config) {
+		if (empty(static::$wwwDir)) {
+			if (!isset($config['wwwDir']) || !is_dir($config['wwwDir'])) {
+				if (isset($config['tempDir']) && is_dir($config['tempDir'])) {
+					$config['wwwDir'] = $config['tempDir'] . '/../www';
+				} else {
+					return;
+				}
+			}
+
+			static::$wwwDir = $config['wwwDir'];
+		}
+
+		foreach (scandir(static::$wwwDir) as $object) {
+			if ($object === ".maintenance.php") {
+				rename(static::$wwwDir . '/' . $object, static::$wwwDir . '/maintenance.php');
+			} else if ($object === "maintenance.php") {
+				rename(static::$wwwDir . '/' . $object, static::$wwwDir . '/.maintenance.php');
+			}
+		}
+	}
+
+	/**
+	 * @param array $config
+	 */
+	public function sleep($config) {
+		if (isset($config['sleep'])) {
+			static::$sleep = $config['sleep'];
+		}
+
+		sleep(static::$sleep);
 	}
 
 	/**
@@ -220,6 +266,9 @@ class Deployment {
 		if (!static::shouldStartDeploy($config)) {
 			return;
 		}
+
+		$this->toggleMaintenance($config);
+		$this->sleep($config);
 
 		ob_start();
 
@@ -254,6 +303,9 @@ class Deployment {
 		$this->clearCache($config);
 
 		ob_clean();
+
+		$this->toggleMaintenance($config);
+		static::$wwwDir = NULL;
 
 		// send response to output
 		$this->sendResponse();

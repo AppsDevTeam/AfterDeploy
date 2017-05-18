@@ -22,8 +22,10 @@ $ composer require adt/deployment
  include __DIR__ . '/../vendor/adt/deployment/src/Deployment.php';
  (new ADT\Deployment\Deployment())
  	->runBase([
- 		'tempDir' => '/path/to/tempDir/', //required
- 		'key' => 'afterDeploy' // optional
+ 		'tempDir' => '/path/to/tempDir/', // required
+ 		'wwwDir' => '/path/to/wwwDir/', // optional, if not given, tempDir/../www is used
+ 		'key' => 'afterDeploy', // optional
+ 		'sleep' => 1 // optional, time to wait before afterDeploy starts in seconds
  	]
 );
 ```
