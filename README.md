@@ -19,10 +19,11 @@ $ composer require adt/deployment
 
 2. Add this code in bootstrap.php before including autoload.php
 ```php
- include __DIR__ . '/../vendor/adt/deployment/src/AfterDeploy.php';
+ include __DIR__ . '/../vendor/adt/after-deploy/src/AfterDeploy.php';
  (new ADT\AfterDeploy\AfterDeploy())
  	->runBase([
  		'tempDir' => '/path/to/tempDir/', // required
+ 		'logDir' => '/path/to/logDir/', // required
  		'wwwDir' => '/path/to/wwwDir/', // optional, if not given, tempDir/../www is used, on
  		'key' => 'afterDeploy', // optional
  		'useMaintenance' => 1 // optional, default = 0

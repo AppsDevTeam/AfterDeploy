@@ -187,6 +187,29 @@ class AfterDeploy {
 	}
 
 	/**
+	 * Removes email-sent file from Log dir
+	 * @param array $config
+	 */
+	protected function clearEmailSent($config = []) {
+		// clear tempDir
+		if (isset($config['logDir']) && is_dir($config['logDir'])) {
+			$count = 0;
+			if (file_exists($config['logDir'] . "/email-sent")) {
+				unlink($config['logDir'] . "/email-sent");
+				$count++;
+			}
+
+			if ($count === 0) {
+				$this->log("Email-sent file in Log dir <bgRed>was not found<reset>.");
+			} else {
+				$this->log("Email-sent file in Log dir <bgGreen>cleared<reset>.");
+			}
+		} else {
+			$this->log("Log dir for removing email-sent file <cyan>is not defined<reset>.");
+		}
+	}
+
+	/**
 	 * Clear Redis
 	 */
 	protected function clearRedis($redis = []) {
@@ -291,6 +314,7 @@ class AfterDeploy {
 
 		$this->clearCache($config);
 		$this->resetAPCandOPCache();
+		$this->clearEmailSent($config);
 
 		ob_clean();
 
