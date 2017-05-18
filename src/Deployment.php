@@ -13,6 +13,9 @@ class Deployment {
 	 */
 	const DEFAULT_KEY = 'afterDeploy';
 
+	/** @var string */
+	protected static $key = self::DEFAULT_KEY;
+
 	/** @var array */
 	protected $commands = [];
 
@@ -29,9 +32,10 @@ class Deployment {
 	/** @var bool */
 	protected $cliMode = TRUE;
 
-	public static function onStartup($config)
-	{
-		if (static::shouldStartDeploy($config)) {
+	public static function onStartup($config) {
+		$config['key'] = static::$key;
+
+		if (!static::shouldStartDeploy($config)) {
 			return;
 		}
 
@@ -203,8 +207,8 @@ class Deployment {
 	}
 
 	protected static function shouldStartDeploy($config) {
-		$key = isset($config['key']) && !empty($config['key']) ? $config['key'] : self::DEFAULT_KEY;
-		return isset($_GET[$key]);
+		static::$key = !empty($config['key']) ? $config['key'] : static::DEFAULT_KEY;
+		return isset($_GET[static::$key]);
 	}
 
 	/**

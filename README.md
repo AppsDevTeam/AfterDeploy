@@ -45,11 +45,10 @@ after[] = http://example.com/?afterDeploy
 $ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
 ```
 
-6. Optionaly you can change the key in neon config (the key has to be same as the one defined in bootstrap.php):
+6. Optionaly you can set the redis in neon config:
 
 ```neon
 deployment:
-	key: mySecretKey # default: afterDeploy
 	redis:
 		client: @redis.client # \Kdyby\Redis\RedisClient
 		dbs:
