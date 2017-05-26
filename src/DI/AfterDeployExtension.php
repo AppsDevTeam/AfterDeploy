@@ -1,8 +1,8 @@
 <?php
 
-namespace ADT\Deployment\DI;
+namespace ADT\AfterDeploy\DI;
 
-class DeploymentExtension extends \Nette\DI\CompilerExtension
+class AfterDeployExtension extends \Nette\DI\CompilerExtension
 {
 
 	/**
