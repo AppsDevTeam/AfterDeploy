@@ -14,7 +14,7 @@ Installation & usage
 
 
 ```sh
-$ composer require adt/deployment
+$ composer require adt/after-deploy
 ```
 
 2. Add this code in bootstrap.php before including autoload.php
@@ -26,7 +26,7 @@ $ composer require adt/deployment
  		'logDir' => '/path/to/logDir/', // required
  		'wwwDir' => '/path/to/wwwDir/', // optional, if not given, tempDir/../www is used, on
  		'key' => 'afterDeploy', // optional
- 		'useMaintenance' => 1 // optional, default = 0
+ 		'useMaintenance' => 1, // optional, default = 0
  		'sleep' => 1 // optional, time to wait before afterDeploy starts in seconds, if useMaintenance is 0 it's not used
  	]
 );

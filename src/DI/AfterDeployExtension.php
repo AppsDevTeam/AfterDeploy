@@ -31,7 +31,7 @@ class AfterDeployExtension extends \Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$builder->getDefinition('application')
-			->addSetup('$container = $service->onStartup[] = function($app) { \ADT\Deployment\Deployment::onStartup(?); }', [$this->config]);
+			->addSetup('$container = $service->onStartup[] = function($app) { \ADT\AfterDeploy\AfterDeploy::onStartup(?); }', [$this->config]);
 
 	}
 
