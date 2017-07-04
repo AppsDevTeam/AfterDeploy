@@ -36,7 +36,7 @@ $ composer require adt/after-deploy
 
 ```neon
 extensions:
-	deployment: ADT\AfterDeploy\DI\AfterDeployExtension
+	afterDeploy: ADT\AfterDeploy\DI\AfterDeployExtension
 ```
 
 4. Update deployment configuration file `deployment.ini` like:
