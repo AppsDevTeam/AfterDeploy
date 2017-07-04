@@ -234,6 +234,16 @@ class AfterDeploy {
 	}
 
 	/**
+	 * Reload BackgroundQueue consumers
+	 */
+	protected function clearBackgroundQueue($config = []) {
+
+		$config['service']->publishSupervisorNoop();
+
+		$this->log("BackgroundQueue consumers <bgGreen>reloaded<reset>.");
+	}
+
+	/**
 	 * Detect access via console
 	 * @return boolean
 	 */
@@ -334,6 +344,10 @@ class AfterDeploy {
 
 		if (isset($config['redis'])) {
 			$this->clearRedis($config['redis']);
+		}
+
+		if (isset($config['backgroundQueue'])) {
+			$this->clearBackgroundQueue($config['backgroundQueue']);
 		}
 
 		$this->clearCache($config);

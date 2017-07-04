@@ -49,7 +49,7 @@ after[] = http://example.com/?afterDeploy
 $ php private/vendor/dg/ftp-deployment/Deployment/deployment.php deployment.ini
 ```
 
-6. Optionaly you can set the redis in neon config:
+6. Optionally you can set the redis in neon config:
 
 ```neon
 afterDeploy:
@@ -58,3 +58,13 @@ afterDeploy:
 		dbs:
 			- 1 # clear db 1
 ```
+
+7. If you use [BackgroundQueue](https://github.com/AppsDevTeam/BackgroundQueue) >= [v2.1.1](https://github.com/AppsDevTeam/BackgroundQueue/releases/tag/v2.1.1), you can optionally set it in neon config:
+
+```neon
+afterDeploy:
+	backgroundQueue:
+		service: @backgroundQueue.service # \ADT\BackgroundQueue\Service
+```
+
+This will send a noop to currently running consumers, so they check if they should terminate. Telling the consumer to terminate on next check (by `-m 1` or by sending `SIGINT` signal) is not part of this component and is up to you.
