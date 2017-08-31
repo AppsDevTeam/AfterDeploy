@@ -128,8 +128,8 @@ class AfterDeploy {
 	 * Install packages/dependencies via composer
 	 */
 	protected function installComposerDeps() {
-		// checks if bower is installed
-		$version = preg_match("/Composer version .+/", $this->cmd("composer -V", TRUE), $match);
+		// checks if composer is installed
+		$version = preg_match("/Composer version .+/", $this->cmd("composer -V --no-ansi", TRUE), $match);
 
 		if ($version) {
 			$this->cmd("composer install -o -n --no-dev 2>&1", TRUE);
