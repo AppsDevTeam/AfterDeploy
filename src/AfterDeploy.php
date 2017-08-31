@@ -84,8 +84,9 @@ class AfterDeploy {
 	 * @param bool $store
 	 * @return string
 	 */
-	protected function cmd($cmd, $store = TRUE) {
-		exec("cd ../ && $cmd", $output);
+	protected function cmd($cmd, $store = TRUE, &$returnVar = NULL) {
+		exec("cd ../ && $cmd", $output, $returnVar);
+
 		$output = implode("\n", $output);
 
 		if ($store) {
@@ -127,12 +128,16 @@ class AfterDeploy {
 	 * Install packages/dependencies via composer
 	 */
 	protected function installComposerDeps() {
-		// checks if bower is installed
-		$version = preg_match("/Composer version .+/", $this->cmd("composer -V", TRUE), $match);
+		// checks if composer is installed
+		$version = preg_match("/Composer version .+/", $this->cmd("composer -V --no-ansi", TRUE), $match);
 
 		if ($version) {
-			$this->cmd("composer install -o -n --no-dev 2>&1", TRUE);
-			return $this->log("Composer <bgGreen>installed<reset>.");
+			$this->cmd("composer install -o -n --no-dev 2>&1", TRUE, $return);
+			if ($return === 0) {
+				return $this->log("Composer <bgGreen>installed<reset>.");
+			} else {
+				return $this->log("Composer <bgRed>install failed<reset>.");
+			}
 		}
 
 		return $this->log("Composer <bgRed>is not installed<reset>.");
