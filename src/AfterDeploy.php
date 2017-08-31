@@ -84,8 +84,9 @@ class AfterDeploy {
 	 * @param bool $store
 	 * @return string
 	 */
-	protected function cmd($cmd, $store = TRUE) {
-		exec("cd ../ && $cmd", $output);
+	protected function cmd($cmd, $store = TRUE, &$returnVar = NULL) {
+		exec("cd ../ && $cmd", $output, $returnVar);
+
 		$output = implode("\n", $output);
 
 		if ($store) {
