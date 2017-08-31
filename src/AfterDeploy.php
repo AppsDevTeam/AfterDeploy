@@ -132,8 +132,12 @@ class AfterDeploy {
 		$version = preg_match("/Composer version .+/", $this->cmd("composer -V --no-ansi", TRUE), $match);
 
 		if ($version) {
-			$this->cmd("composer install -o -n --no-dev 2>&1", TRUE);
-			return $this->log("Composer <bgGreen>installed<reset>.");
+			$this->cmd("composer install -o -n --no-dev 2>&1", TRUE, $return);
+			if ($return === 0) {
+				return $this->log("Composer <bgGreen>installed<reset>.");
+			} else {
+				return $this->log("Composer <bgRed>install failed<reset>.");
+			}
 		}
 
 		return $this->log("Composer <bgRed>is not installed<reset>.");
